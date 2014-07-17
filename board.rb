@@ -1,15 +1,12 @@
 require_relative 'piece'
 require 'colorize'
 
-puts "I am yellow".yellow
-
 
 class Board
 
   def initialize
     fill_board
     @death_toll = {white: 0, black: 0}
-    render
   end
 
   def [](pos)
@@ -42,16 +39,20 @@ class Board
     end
   end
 
-  def fill_board
-    @rows = Array.new(8) {Array.new(8)}
-    [:white, :black].each {|color| fill_rows(color)}
+  def make_move!(color, from_pos, to_pos)
+    piece = self[from_pos]
+
+    @death_toll[self[to_pos].color] += 1 if !self[to_pos].nil?
+    self[to_pos] = piece
+    piece.position = to_pos
+    self[from_pos] = nil
   end
 
   def render
     color_arr = [:light_red, :light_black]
      print "\n\n"
      @rows.each_with_index do |row, i1|
-       print "\t\t #{i1+1}"
+       print "\t\t #{i1}"
        row.each_with_index do |tile, i2|
          if tile.nil?
            print "  ".colorize(:background => color_arr[0])
@@ -64,8 +65,17 @@ class Board
        color_arr.rotate![1]
        print "\n"
      end
-     print "\t\t  A B C D E F G H"
+     print "\t\t  0 1 2 3 4 5 6 7"
      print "\n\n"
   end
+
+    protected
+
+  def fill_board
+    @rows = Array.new(8) {Array.new(8)}
+    [:white, :black].each {|color| fill_rows(color)}
+  end
+
+
 
 end
