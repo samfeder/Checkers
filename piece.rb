@@ -24,44 +24,47 @@ class Piece
     moves = []
     move_diffs.each_with_object([]) do |(dx, dy), moves|
       current_x, current_y = position
-
+      #p "cur x, dx, cur y, dy #{current_x} #{dx} #{current_y} #{dy}"
       position = [current_x + dx, current_y + dy]
       next unless board.valid_pos?(position)
 
       if board[position].nil?
         moves << position
-        p moves
       elsif board[position].color != color
-        jump_pos = position.map { |loc| loc *=2}
-        moves << jump_pos if board.empty?(jump_pos)
-        p moves
+        jump_pos = [current_x + (dx*2), current_y + (dy*2)]
+        moves << jump_pos if board[jump_pos].nil? && board.valid_pos?(jump_pos)
       end
     end
   end
 
   def perform_slide(from_pos, to_pos)
-    return false if !moves.include?(to_pos)
     @board[to_pos] = self
-    @board[from_pos] = nil
+    @board[from_pos]= to_pos
     position = to_pos
 
-    @promoted = true if maybe_promote?
+    @promoted = true if maybe_promote?(to_pos)
     true
   end
-# TODO HAS POSSS!!!
+
   def perform_jump(from_pos, to_pos)
-    return false if !moves.include?(pos)
-    @board.kill_total[@board[from_pos].color] += 1
+    @board.kill_total[@board[to_pos].color] += 1
     @board[to_pos] = self
-    @board[from_pos] = nil
+    @board[from_pos] = to_pos
     position = to_pos
-
-    @promoted = true if maybe_promote?
+    @board[kill_pos(from_pos, to_pos)] = nil
+    @promoted = true if maybe_promote?(to_pos)
     true
   end
 
-  def maybe_promote?
-    true if (color == :white && pos[i] == 0) || (color == :black && pos[i] == 7)
+  def kill_pos(from_pos, to_pos)
+    kill_spot = []
+    diff = [from_pos[0] - to_pos[0], from_pos[1] - to_pos[1]]
+    to_pos.each_index { |i| kill_spot << to_pos[i] + diff[i]/2}
+    kill_spot
+  end
+
+  def maybe_promote?(to_pos)
+    true if (color == :white && to_pos[0] == 0) || (color == :black && to_pos[0] == 7)
   end
 
 

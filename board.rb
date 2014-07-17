@@ -4,9 +4,15 @@ require 'colorize'
 
 class Board
 
+  attr_accessor :kill_total
+
+  def inspect
+
+  end
+
   def initialize
     fill_board
-    @death_toll = {white: 0, black: 0}
+    @kill_total = {white: 0, black: 0}
   end
 
   def [](pos)
@@ -41,15 +47,16 @@ class Board
 
   def make_move!(color, from_pos, to_pos)
     piece = self[from_pos]
-
-    @death_toll[self[to_pos].color] += 1 if !self[to_pos].nil?
+    @kill_total[self[to_pos].color] += 1 if !self[to_pos].nil?
     self[to_pos] = piece
     piece.position = to_pos
+    piece.perform_slide(from_pos, to_pos) if ((from_pos[0] - to_pos[0]).abs == 1)
+    piece.perform_jump(from_pos, to_pos) if ((from_pos[0] - to_pos[0]).abs == 2)
     self[from_pos] = nil
   end
 
   def render
-    color_arr = [:light_red, :light_black]
+    color_arr = [:light_black, :light_red]
      print "\n\n"
      @rows.each_with_index do |row, i1|
        print "\t\t #{i1}"
@@ -67,6 +74,7 @@ class Board
      end
      print "\t\t  0 1 2 3 4 5 6 7"
      print "\n\n"
+     print "Kill Total: #{@kill_total}"
   end
 
     protected
