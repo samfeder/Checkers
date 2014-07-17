@@ -10,8 +10,8 @@ class Board
 
   end
 
-  def initialize
-    fill_board
+  def initialize(new_board = true)
+    fill_board if new_board == true
     @kill_total = {white: 0, black: 0}
   end
 
@@ -41,6 +41,20 @@ class Board
         self[[i,j]] = Piece.new(color, self, [i,j])
       end
     end
+  end
+
+  def dup
+    new_board = Board.new(false)
+
+    pieces.each do |piece|
+      piece.class.new(piece.color, new_board, piece.pos)
+    end
+
+    new_board
+  end
+
+  def pieces
+    @rows.flatten.compact
   end
 
   def make_move!(color, from_pos, to_pos)

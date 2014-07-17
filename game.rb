@@ -48,14 +48,26 @@ class HumanPlayer
     begin
       puts board.render
       puts "#{@color}'s turn"
-      from_pos = get_position("Provide ROW+COL of moving piece: ")
-      #raise InvalidSelection if !board.valid_move(from_pos)
+      from_pos = get_position("Provide ROW+COL of moving piece: ").flatten
+      raise InvalidSelection if !board.valid_pos?(from_pos)
       raise BadOwnership if !valid_owner?(board, color, from_pos)
       raise MovelessPiece if !valid_selection?(board, from_pos)
       puts "You have these moves available #{board[from_pos].moves}"
       to_pos = get_position("Provide ROW+COL of new tile: ")
-      raise BadMove if !valid_move?(board, from_pos, to_pos)
-      board.make_move!(color, from_pos, to_pos)
+      if to_pos.length == 1
+        to_pos.flatten!
+        raise InvalidSelection if !board.valid_pos?(to_pos)
+        raise BadMove if !valid_move?(board, from_pos, to_pos)
+        board.make_move!(color, from_pos, to_pos)
+      else
+        raise BadMove if !all_valid_moves?(to_pos)
+        to_pos.each do |jump_num|board.make_move!(color, from_pos, jump_num)
+          from_pos = jump_num
+        end
+      end
+    rescue InvalidSelection
+      puts "That is not a valid tile."
+      retry
     rescue BadOwnership
       puts "You do not have a piece there."
       retry
@@ -67,6 +79,12 @@ class HumanPlayer
       retry
     end
 
+  end
+
+  all_valid_moves?(to_pos)
+  #in this case, to_pos comes in as an array of strung together moves.
+  #first thing to check is if the move is a jump
+  #then if it is a jump, dup board and check legality.
   end
 
   def valid_move?(board, from_pos, to_pos)
@@ -83,11 +101,21 @@ class HumanPlayer
 
   def get_position(prompt)
     puts prompt
-    gets.chomp.split(',').map {|coord_s| Integer(coord_s)}
+    coord = []
+    coord_list = []
+    moves_list = gets.chomp.split(" ")
+    moves_list.each do |move|
+      move.split(',').map {|coord_s| coord << Integer(coord_s)}
+      coord_list << coord
+      coord = []
+    end
+    coord_list
   end
 
 end
 
+class InvalidSelection < StandardError
+end
 class MovelessPiece < StandardError
 end
 class BadMove < StandardError
