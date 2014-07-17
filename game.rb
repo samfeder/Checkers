@@ -60,7 +60,7 @@ class HumanPlayer
         raise BadMove if !valid_move?(board, from_pos, to_pos)
         board.make_move!(color, from_pos, to_pos)
       else
-        raise BadMove if !all_valid_moves?(to_pos)
+        raise BadMove if !all_valid_moves?(from_pos, to_pos)
         to_pos.each do |jump_num|board.make_move!(color, from_pos, jump_num)
           from_pos = jump_num
         end
@@ -81,10 +81,19 @@ class HumanPlayer
 
   end
 
-  all_valid_moves?(to_pos)
-  #in this case, to_pos comes in as an array of strung together moves.
-  #first thing to check is if the move is a jump
-  #then if it is a jump, dup board and check legality.
+  def all_valid_moves?(from_pos, to_pos)
+    #in this case, to_pos comes in as an array of strung together moves.
+    #first thing to check is if the move is a jump
+    #then if it is a jump, dup board and check legality.
+    to_pos.each do |jump|
+      raise BadMove if !is_jump?(from_pos, jump)
+      #DUP DUP DUP
+
+    end
+  end
+
+  def is_jump?(from_pos, to_pos)
+    (from_pos[0]-to_pos[0]).abs == 2 && (from_pos[1]-to_pos[1]).abs == 2
   end
 
   def valid_move?(board, from_pos, to_pos)
