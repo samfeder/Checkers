@@ -1,10 +1,12 @@
-require_relative 'pieces'
+require_relative 'piece'
 
 class Board
 
   def initialize
     fill_board
     death_toll = {white: 0, black: 0}
+    render
+    p death_toll
   end
 
   def [](pos)
@@ -30,7 +32,7 @@ class Board
     even_rows = [0,2,4,6]
     i = (color == :white) ? [7,6,5] : [0,1,2]
     i.each do |row|
-      j = (i.is_even?) ? even_rows : odd_rows
+      j = (row.even?) ? even_rows : odd_rows
       j.each { |j| Piece.new(color, self, [i,j])}
     end
   end
@@ -38,6 +40,14 @@ class Board
   def fill_board
     @rows = Array.new(8) {Array.new(8)}
     [:white, :black].each {|color| fill_rows(color)}
+  end
+
+  def render
+    @rows.map do |row|
+      row.map do |piece|
+        piece.nil? ? '.' : piece.render
+      end.join
+    end.join('\n')
   end
 
 end

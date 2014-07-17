@@ -16,7 +16,7 @@ class Piece
   end
 
   def moves
-    moves_diffs.each_with_object([]) |(dx, dy), moves|
+    moves_diffs.each_with_object([]) do |(dx, dy), moves|
       current_x, current_y = pos
       pos = [current_x + dx, cur_y + dy]
 
