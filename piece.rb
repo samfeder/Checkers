@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
+require 'colorize'
 
 class Piece
+
+  attr_reader :color
 
   MOVES =[[1,1],[1,-1],[-1,-1],[-1,1]]
 
@@ -11,8 +14,12 @@ class Piece
     @promoted = promoted
   end
 
-  def symbols
-    {white: "⚪", black: "⚫"}
+  def inspect
+
+  end
+
+  def render
+    {white: "⚪", black: "⚫"}[color]
   end
 
   def moves

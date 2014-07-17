@@ -1,12 +1,15 @@
 require_relative 'piece'
+require 'colorize'
+
+puts "I am yellow".yellow
+
 
 class Board
 
   def initialize
     fill_board
-    death_toll = {white: 0, black: 0}
+    @death_toll = {white: 0, black: 0}
     render
-    p death_toll
   end
 
   def [](pos)
@@ -24,16 +27,18 @@ class Board
   end
 
   def valid_pos?(pos)
-    pos.all? { |coord| coord.between?(0, 7) && (coord[0] + coord[1]).is_even? }
+    pos.all? { |coord| coord.between?(0, 7) }
   end
 
   def fill_rows(color)
     odd_rows = [1,3,5,7]
     even_rows = [0,2,4,6]
-    i = (color == :white) ? [7,6,5] : [0,1,2]
-    i.each do |row|
-      j = (row.even?) ? even_rows : odd_rows
-      j.each { |j| Piece.new(color, self, [i,j])}
+    color == :white ? row = [7,6,5] : row = [0,1,2]
+    row.each do |i|
+      j = (i.even?) ? even_rows : odd_rows
+      j.each do |j|
+        self[[i,j]] = Piece.new(color, self, [i,j])
+      end
     end
   end
 
@@ -43,11 +48,24 @@ class Board
   end
 
   def render
-    @rows.map do |row|
-      row.map do |piece|
-        piece.nil? ? '.' : piece.render
-      end.join
-    end.join('\n')
+    color_arr = [:light_red, :light_black]
+     print "\n\n"
+     @rows.each_with_index do |row, i1|
+       print "\t\t #{i1+1}"
+       row.each_with_index do |tile, i2|
+         if tile.nil?
+           print "  ".colorize(:background => color_arr[0])
+           color_arr.rotate![1]
+         else
+           print "#{tile.render} ".colorize(:background => color_arr[0])
+           color_arr.rotate![1]
+         end
+       end
+       color_arr.rotate![1]
+       print "\n"
+     end
+     print "\t\t  A B C D E F G H"
+     print "\n\n"
   end
 
 end
