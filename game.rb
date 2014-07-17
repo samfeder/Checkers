@@ -49,6 +49,7 @@ class HumanPlayer
       puts board.render
       puts "#{@color}'s turn"
       from_pos = get_position("Provide ROW+COL of moving piece: ")
+      #raise InvalidSelection if !board.valid_move(from_pos)
       raise BadOwnership if !valid_owner?(board, color, from_pos)
       raise MovelessPiece if !valid_selection?(board, from_pos)
       puts "You have these moves available #{board[from_pos].moves}"

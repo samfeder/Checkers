@@ -3,8 +3,8 @@ require 'colorize'
 
 class Piece
 
-  attr_reader :color, :board
-  attr_accessor :position, :promoted
+  attr_reader :color, :board, :position
+  attr_accessor :promoted
 
   MOVES =[[1,1],[1,-1],[-1,-1],[-1,1]]
 
@@ -15,9 +15,8 @@ class Piece
     @promoted = promoted
   end
 
-
   def render
-    {white: "⚪", black: "⚫"}[color]
+    @promoted == false ? {white: "⚪", black: "⚫"}[color] : {white: "◯", black: "◉"}[color]
   end
 
   def moves
@@ -37,34 +36,35 @@ class Piece
     end
   end
 
-  def perform_slide(from_pos, to_pos)
-    @board[to_pos] = self
-    @board[from_pos]= to_pos
-    position = to_pos
-
-    @promoted = true if maybe_promote?(to_pos)
-    true
+  def position=(new_pos)
+    board[@position] = nil
+    @position = new_pos
+    board[new_pos] = self
   end
 
+  def perform_slide(from_pos, to_pos)
+    self.position = to_pos
+    maybe_promote(to_pos)
+  end
+
+
   def perform_jump(from_pos, to_pos)
-    @board.kill_total[@board[to_pos].color] += 1
-    @board[to_pos] = self
-    @board[from_pos] = to_pos
-    position = to_pos
-    @board[kill_pos(from_pos, to_pos)] = nil
-    @promoted = true if maybe_promote?(to_pos)
+    board.kill_total[board[to_pos].color] += 1
+    self.position = to_pos
+    board[kill_pos(from_pos, to_pos)] = nil
+    maybe_promote(to_pos)
     true
   end
 
   def kill_pos(from_pos, to_pos)
-    kill_spot = []
-    diff = [from_pos[0] - to_pos[0], from_pos[1] - to_pos[1]]
-    to_pos.each_index { |i| kill_spot << to_pos[i] + diff[i]/2}
-    kill_spot
+    [(from_pos[0] + to_pos[0])/2, (from_pos[1] + to_pos[1])/2]
   end
 
-  def maybe_promote?(to_pos)
-    true if (color == :white && to_pos[0] == 0) || (color == :black && to_pos[0] == 7)
+  def maybe_promote(to_pos)
+    if (color == :white && to_pos[0] == 0) || (color == :black && to_pos[0] == 7)
+      puts "#{color} promoted their piece!"
+      @promoted = true
+    end
   end
 
 

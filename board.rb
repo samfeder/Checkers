@@ -16,14 +16,12 @@ class Board
   end
 
   def [](pos)
-    raise 'invalid pos' unless valid_pos?(pos)
-
     i, j = pos
     @rows[i][j]
   end
 
   def []=(pos, piece)
-    raise 'invalid pos' unless valid_pos?(pos)
+
 
     i, j = pos
     @rows[i][j] = piece
