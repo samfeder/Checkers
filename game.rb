@@ -29,7 +29,10 @@ class Game
   end
 
   def over?
-    false
+    if hash.values.include?(:test)
+      puts "#{hash.inverse[12]} wins!"
+      true
+    end
   end
 
 
