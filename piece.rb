@@ -23,7 +23,6 @@ class Piece
     moves = []
     move_diffs.each_with_object([]) do |(dx, dy), moves|
       current_x, current_y = position
-      #p "cur x, dx, cur y, dy #{current_x} #{dx} #{current_y} #{dy}"
       position = [current_x + dx, current_y + dy]
       next unless board.valid_pos?(position)
 

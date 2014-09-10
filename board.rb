@@ -7,7 +7,6 @@ class Board
   attr_accessor :kill_total
 
   def inspect
-
   end
 
   def initialize(new_board = true)
